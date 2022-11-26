@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ViCue-Soft-okunev-test-app</string>
+
+    <string name="welcome">Welcome</string>
+    <string name="text_button">TEXT</string>
+    <string name="smth_wrong">Something wrong :(</string>
+    <string name="try_again">Try again</string>
+</resources>
