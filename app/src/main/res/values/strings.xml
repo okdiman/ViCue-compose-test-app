@@ -5,4 +5,6 @@
     <string name="text_button">TEXT</string>
     <string name="smth_wrong">Something wrong :(</string>
     <string name="try_again">Try again</string>
+    <string name="back_button_text">I do not know why, but this button was in design</string>
+    <string name="back_button_action_text">Okay</string>
 </resources>

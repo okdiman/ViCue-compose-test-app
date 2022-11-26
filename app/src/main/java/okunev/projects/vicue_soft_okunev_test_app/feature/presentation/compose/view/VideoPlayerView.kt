@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -19,12 +20,9 @@ import okunev.projects.vicue_soft_okunev_test_app.feature.presentation.viewmodel
 
 @Composable
 fun VideoPlayerView(state: MainState) {
+    val lastUrl = remember { mutableStateOf("") }
     val context = LocalContext.current
-    val defaultDataSourceFactory = DefaultDataSource.Factory(context)
-    val dataSourceFactory = DefaultDataSource.Factory(
-        context,
-        defaultDataSourceFactory
-    )
+    val dataSourceFactory = DefaultDataSource.Factory(context)
     val exoPlayer = remember {
         ExoPlayer.Builder(context)
             .build().apply {
@@ -33,10 +31,13 @@ fun VideoPlayerView(state: MainState) {
                 repeatMode = Player.REPEAT_MODE_ALL
             }
     }.apply {
-        val source = ProgressiveMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(MediaItem.fromUri(state.selectedVideoUrl))
-        setMediaSource(source)
-        prepare()
+        if (lastUrl.value != state.selectedVideoUrl) {
+            val source = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(state.selectedVideoUrl))
+            setMediaSource(source)
+            prepare()
+            lastUrl.value = state.selectedVideoUrl
+        }
     }
 
     DisposableEffect(
