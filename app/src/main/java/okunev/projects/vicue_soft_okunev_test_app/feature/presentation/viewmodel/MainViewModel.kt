@@ -1,9 +1,7 @@
 package okunev.projects.vicue_soft_okunev_test_app.feature.presentation.viewmodel
 
-import com.adeo.kviewmodel.BaseSharedViewModel
-import java.io.IOException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import okunev.projects.vicue_soft_okunev_test_app.core.BaseViewModel
 import okunev.projects.vicue_soft_okunev_test_app.feature.domain.VideoRepository
 import okunev.projects.vicue_soft_okunev_test_app.feature.presentation.viewmodel.models.MainAction
 import okunev.projects.vicue_soft_okunev_test_app.feature.presentation.viewmodel.models.MainEvent
@@ -11,8 +9,7 @@ import okunev.projects.vicue_soft_okunev_test_app.feature.presentation.viewmodel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class MainViewModel :
-    BaseSharedViewModel<MainState, MainAction, MainEvent>(MainState(isLoading = true)),
+class MainViewModel : BaseViewModel<MainState, MainAction, MainEvent>(MainState(isLoading = true)),
     KoinComponent {
 
     private val repository by inject<VideoRepository>()
@@ -46,22 +43,19 @@ class MainViewModel :
     }
 
     private fun fetchVideos() {
-        viewModelScope.launch(Dispatchers.IO) {
-            viewState = viewState.copy(isLoading = true)
-            try {
+        launchJob(
+            context = Dispatchers.IO,
+            onError = { viewState = viewState.copy(isError = true) },
+            onFinally = { viewState = viewState.copy(isLoading = false) },
+            job = {
+                viewState = viewState.copy(isLoading = true)
                 val result = repository.fetchAllVideos()
-                viewState =
-                    viewState.copy(
-                        items = result,
-                        selectedVideoUrl = result.first().videoUrl,
-                        isError = false
-                    )
-            } catch (e: IOException) {
-                viewState = viewState.copy(isError = true)
-            } finally {
-                viewState = viewState.copy(isLoading = false)
-            }
-        }
+                viewState = viewState.copy(
+                    items = result,
+                    selectedVideoUrl = result.first().videoUrl,
+                    isError = false
+                )
+            })
     }
 
     private fun playNewVideo(newUrl: String) {
